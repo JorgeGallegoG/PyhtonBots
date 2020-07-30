@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Spyder Editor
 
-This is a temporary script file.
-"""
 from selenium import webdriver
 from time import sleep
 from random import randint
@@ -58,24 +54,23 @@ class InstaBot:
             while n > 0:
                 self._take_naps(n)
                 self._human_sleep(2)
+                
                 name_element = self.driver.find_element_by_xpath("//a[contains(@href, '/{}')]".format(mofos[m-n]))
-                print("**** Stop following " + mofos[m-n] + " ****")
-                antecesor = self._find_ancestor(5, name_element)                
-                self._take_naps(12)
+                antecesor = self._find_ancestor(5, name_element) 
+                button = antecesor.find_element_by_xpath(".//button[contains(text(), 'Following')]")
+
+
+                
                 self._human_sleep(5)
-                antecesor.find_element_by_xpath("//button[contains(text(), 'Following')]")\
-                    .click()
+                button.click()
                 self._human_sleep(2)
-                try:
-                    hard_to_unfollow = self.driver.find_element_by_xpath("//a[contains(text(), 'If you change your mind')]")
-                    self.driver.find_element_by_xpath("//button[contains(text(), 'Unfollow')]")\
+
+                self.driver.find_element_by_xpath("//button[contains(text(), 'Unfollow')]")\
                     .click()
-                    print("**** That was a private user ****")
-                except NoSuchElementException:
-                    self.driver.find_element_by_xpath("//button[contains(text(), 'Unfollow')]")\
-                    .click()
-                    print("**** That was a public user ****")
-                    
+                    #print("**** That was a public user ****")
+                
+                sleep(60*60)
+                
                 self._human_sleep_slow(3)
 
                 n-=1
