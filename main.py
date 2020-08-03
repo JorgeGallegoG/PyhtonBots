@@ -3,8 +3,7 @@
 from selenium import webdriver
 from time import sleep
 from random import randint
-from selenium.common.exceptions import NoSuchElementException
-
+from selenium.webdriver.common.keys import Keys
 
 class InstaBot:
         def __init__(self, username, pw):
@@ -13,6 +12,8 @@ class InstaBot:
             self.driver.get("https://instagram.com")
 
             self._human_sleep(2)
+            
+            #Log in
             self.driver.find_element_by_xpath("//input[@name=\"username\"]")\
                 .send_keys(username)
             self.driver.find_element_by_xpath("//input[@name=\"password\"]")\
@@ -72,8 +73,44 @@ class InstaBot:
                 self._human_sleep_slow(3)
 
                 n-=1
-                
             
+        def talk_to_fans_of(self, account_name, n_of_fans):
+                search_bar = self.driver.find_element_by_xpath("//input[@placeholder=\"Search\"]")
+                search_bar.send_keys(account_name)
+                self._human_sleep(3)
+                search_bar.send_keys(Keys.RETURN)
+                search_bar.send_keys(Keys.RETURN)
+                self._human_sleep(4)
+                self.driver.find_element_by_xpath("//a[contains(@href, 'followers')]")\
+                    .click()
+                self._human_sleep(2)
+                print("**** Accessing the followers of " + account_name + " ****")
+                    
+                #Start following people
+                followed_list = []
+                scroll_box = self.driver.find_element_by_xpath("/html/body/div[4]/div/div/div[2]")
+                for x in range(n_of_fans):
+                    button_to_follow = scroll_box.find_element_by_xpath(".//button[text()='Follow']")
+                    if button_to_follow == None:
+                        self.driver.execute_script("""
+                                                   arguments[0].scrollTo(0, arguments[0].scrollHeight);
+                                                   return arguments[0].scrollHeight;
+                                               """, scroll_box)
+                        self._human_sleep(3)
+                        continue
+                    
+                    button_to_follow.click()
+                    self._human_sleep(5)
+                    antecesor = self._find_ancestor(5, button_to_follow) 
+                    button_followed = antecesor.find_element_by_xpath(".//button[contains(text(), 'Following')]")
+                    if button_followed != None:
+                        name_of_followed = antecesor.find_element_by_xpath(".//a[@href]")
+                        name_of_followed.click()
+                        followed_list.append(name_of_followed.text)
+                        
+                        self._human_sleep(1) 
+                print(followed_list)
+                
         def _get_names(self):
             self._human_sleep(1)
             scroll_box = self.driver.find_element_by_xpath("/html/body/div[4]/div/div/div[2]")
@@ -109,37 +146,37 @@ class InstaBot:
         def _human_sleep_fast(self, n):
             sleep(n + randint(0,1))
         def _take_naps(self, n):
-            if n == 5:
+            if n == 4:
                 print("**** Napping 5 min ****", flush=True)
-                sleep(63*5)
-            if n == 12:
+                sleep(63*4)
+            if n == 10:
                 print("**** napping 11 min ****", flush=True)
-                sleep(60*11)
-            if n == 20:
+                sleep(60*12)
+            if n == 17:
                 print("**** napping 14 min ****", flush=True)
-                sleep(52*14)
-            if n == 24:
+                sleep(52*12)
+            if n == 25:
                 print("**** napping 3 min ****", flush=True)
                 sleep(55*3)
-            if n == 29:
+            if n == 30:
                 print("**** napping 4 min ****", flush=True)
-                sleep(64*4)
-            if n == 31:
+                sleep(64*5)
+            if n == 33:
                 print("**** napping 23 min ****", flush=True)
-                sleep(60*23)
+                sleep(60*24)
             if n == 37:
                 print("**** napping 6 min ****", flush=True)
-                sleep(59*6)
-            if n == 42:
+                sleep(59*4)
+            if n == 40:
                 print("**** napping 5 min ****", flush=True)
-                sleep(49*5)
-            if n == 46:
+                sleep(49*6)
+            if n == 45:
                 print("**** napping 9 min ****", flush=True)
-                sleep(57*9)
-            if n == 49:
+                sleep(57*7)
+            if n == 48:
                 print("**** Napping 5 min ****", flush=True)
-                sleep(56*5)
-            
-                     
+                sleep(56*6)
+                            
 a_bot = InstaBot('account', 'pass')
 a_bot.unfollow_bastards(50)
+#a_bot.talk_to_fans_of("artist_name", 1)
