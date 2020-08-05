@@ -4,13 +4,16 @@ from selenium import webdriver
 from time import sleep
 from random import randint
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import NoSuchElementException
+import csv
+import math
 
 class InstaBot:
         def __init__(self, username, pw):
             self.driver = webdriver.Chrome()
             self.username = username
             self.driver.get("https://instagram.com")
-
+            
             self._human_sleep(2)
             
             #Log in
@@ -26,6 +29,8 @@ class InstaBot:
             self._human_sleep(4)
             self.driver.find_element_by_xpath("//button[contains(text(), 'Not Now')]")\
                 .click()
+        _following_path = ".\data"
+        _following_file_name = "following"
                 
         def get_unfollowers(self):
             self.driver.find_element_by_xpath("//a[contains(@href,'/{}')]".format(self.username))\
@@ -90,27 +95,102 @@ class InstaBot:
                 followed_list = []
                 scroll_box = self.driver.find_element_by_xpath("/html/body/div[4]/div/div/div[2]")
                 for x in range(n_of_fans):
-                    button_to_follow = scroll_box.find_element_by_xpath(".//button[text()='Follow']")
-                    if button_to_follow == None:
-                        self.driver.execute_script("""
-                                                   arguments[0].scrollTo(0, arguments[0].scrollHeight);
-                                                   return arguments[0].scrollHeight;
-                                               """, scroll_box)
-                        self._human_sleep(3)
-                        continue
-                    
+                    flag = False
+                    while flag == False:
+                        self._human_sleep(5)
+                        try:
+                            button_to_follow = scroll_box.find_element_by_xpath(".//button[text()='Follow']")
+                            flag = True
+                        except NoSuchElementException:
+                            self.driver.execute_script("""
+                                                       arguments[0].scrollTo(0, arguments[0].scrollHeight);
+                                                       return arguments[0].scrollHeight;
+                                                   """, scroll_box)
+                            self._human_sleep(3)
+                            continue
                     button_to_follow.click()
                     self._human_sleep(5)
-                    antecesor = self._find_ancestor(5, button_to_follow) 
-                    button_followed = antecesor.find_element_by_xpath(".//button[contains(text(), 'Following')]")
-                    if button_followed != None:
-                        name_of_followed = antecesor.find_element_by_xpath(".//a[@href]")
+                    antecesor = self._find_ancestor(3, button_to_follow)
+                    list_name_of_followed_b = antecesor.find_elements_by_tag_name('a')
+                    temp_list_names_of_followed_text = [name.text for name in list_name_of_followed_b if name.text != '']
+                    name_of_followed = antecesor.find_element_by_xpath(".//a[@href]")
+                    try:
+                        button_followed = antecesor.find_element_by_xpath(".//button[contains(text(), 'Following')]")
                         name_of_followed.click()
-                        followed_list.append(name_of_followed.text)
+                        self._human_sleep(3)
+                        print(temp_list_names_of_followed_text[0])
+                        followed_list.extend(temp_list_names_of_followed_text)
+                        self.driver.find_element_by_xpath("//button[contains(text(), 'Message')]")\
+                        .click()
+                        self._send_messages()
+                        self._human_sleep_fast(2)
+                        self.driver.execute_script("window.history.go(-1)")
+                        self._human_sleep(4)
+                        self.driver.execute_script("window.history.go(-1)")
+                    except NoSuchElementException:
+                        pass
                         
-                        self._human_sleep(1) 
-                print(followed_list)
+                    self._human_sleep(1)
+                    temp_list_names_of_followed_text = []
+                    print("**** CUCA ****")
+                    self._human_sleep(4)
+                    scroll_box = self.driver.find_element_by_xpath("/html/body/div[3]/div/div/div[2]")
+                with open (self._following_path + self._following_file_name + ".csv",'a') as following_file:
+                    writer = csv.writer(following_file, dialect='excel')
+                    writer.writerow(followed_list)
+                    self._human_sleep(4)
+                    self.driver.execute_script("window.history.go(-1)")
+                    self._human_sleep(5)
+                    self.driver.execute_script("window.history.go(-1)")
+                    self._human_sleep(3)
+                    self.driver.execute_script("window.history.go(-1)")
+               
+        def _send_messages(self):
+            list_messages = self._generate_messages()
+            self._human_sleep(6)
+            for msg in list_messages:
+                message_bar = self.driver.find_element_by_xpath("//textarea[@placeholder=\"Message...\"]")
+                #Using javascript to send emojis (not suported by send kesys method)
+                JS_ADD_TEXT_TO_INPUT = """
+                                      var elm = arguments[0], txt = arguments[1];
+                                      elm.value += txt;
+                                      elm.dispatchEvent(new Event('change'));
+                                      """
+    
+                self.driver.execute_script(JS_ADD_TEXT_TO_INPUT, message_bar, msg)
+                self._human_sleep(10)
+                #message_bar.click()
+                message_bar.send_keys(" ")
+                self.driver.find_element_by_xpath("//button[contains(text(), 'Send')]")\
+                   .click()
                 
+
+                self._human_sleep(3)
+            
+        #Method to generate a list of messages that when put toguether generate a conversation
+        def _generate_messages(self):
+            all_messages = []
+            
+            #Every list contains all the possible messages in that possition (inside de message secuence)
+            all_messages.append(["Hi human!", "Hey human!", "I like your style human!"])
+            all_messages.append (["I am a monster 😊, But a good one ☝"])
+            all_messages.append (["I came from the Monsterland ", "I came to the Humanland "])
+            all_messages.append (["to show humans the sounds we monsters do", "to show humans the sounds of monsters", "to show you the sounds of monsters", "to show you the sounds we monsters do"])
+            all_messages.append (["Do you like DnB?, check my track!", "If you like trippy stuff, check out:", "I released this song with some cool animations 👇"])
+            all_messages.append (["https://www.youtube.com/watch?v=U8Y_XPxr8g4&feature=youtu.be"])
+            all_messages.append (["I hope you like it!", "I hope you enjoy!", "Enjoy!"])
+            all_messages.append (["And have a great human day!", "And have a great human day! Or like we monsters say, GRROOOTHK!!! ❤️"])
+            all_messages.append (["❤️", "👌", "🖖"])
+            return self._select_one_message_for_each_row(all_messages)
+            
+            
+        def _select_one_message_for_each_row(self, all_messages):
+            resulting_list = []
+            for row in all_messages:
+                resulting_list.append(row[randint(0, len(row))-1])
+            return resulting_list
+                                          
+            
         def _get_names(self):
             self._human_sleep(1)
             scroll_box = self.driver.find_element_by_xpath("/html/body/div[4]/div/div/div[2]")
@@ -178,5 +258,6 @@ class InstaBot:
                 sleep(56*6)
                             
 a_bot = InstaBot('account', 'pass')
-a_bot.unfollow_bastards(50)
-#a_bot.talk_to_fans_of("artist_name", 1)
+#a_bot.unfollow_bastards(50)
+a_bot.talk_to_fans_of("account_similar_to_yours", 4)
+#print(a_bot._generate_messages())
