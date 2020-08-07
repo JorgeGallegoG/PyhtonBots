@@ -65,8 +65,6 @@ class InstaBot:
                 antecesor = self._find_ancestor(5, name_element) 
                 button = antecesor.find_element_by_xpath(".//button[contains(text(), 'Following')]")
 
-
-                
                 self._human_sleep(5)
                 button.click()
                 print("**** Stopped following " + mofos[m-n] + " ****")
@@ -94,19 +92,33 @@ class InstaBot:
                 #Start following people
                 followed_list = []
                 scroll_box = self.driver.find_element_by_xpath("/html/body/div[4]/div/div/div[2]")
+                changed_scroll_flag = False 
                 for x in range(n_of_fans):
+                    self._take_naps(x)
+                    #When we are accesing this manu from the "previous page function" the xpath of the scroll box is changed
+                    if changed_scroll_flag == True: 
+                        scroll_box = self.driver.find_element_by_xpath("/html/body/div[3]/div/div/div[2]")
+                    self._human_sleep(2)
                     flag = False
                     while flag == False:
                         self._human_sleep(5)
                         try:
                             button_to_follow = scroll_box.find_element_by_xpath(".//button[text()='Follow']")
                             flag = True
+                        #if there is no contact to follow loaded keep scrolling
                         except NoSuchElementException:
                             self.driver.execute_script("""
                                                        arguments[0].scrollTo(0, arguments[0].scrollHeight);
                                                        return arguments[0].scrollHeight;
                                                    """, scroll_box)
                             self._human_sleep(3)
+                            
+                            #scroll 2 times to be sure it does not get stuck
+                            self.driver.execute_script("""
+                                                       arguments[0].scrollTo(0, arguments[0].scrollHeight);
+                                                       return arguments[0].scrollHeight;
+                                                   """, scroll_box)
+                            self._human_sleep(4)
                             continue
                     button_to_follow.click()
                     self._human_sleep(5)
@@ -122,8 +134,16 @@ class InstaBot:
                         followed_list.extend(temp_list_names_of_followed_text)
                         self.driver.find_element_by_xpath("//button[contains(text(), 'Message')]")\
                         .click()
-                        self._send_messages()
-                        self._human_sleep_fast(2)
+                        self._human_sleep(4)
+                        
+                        #When we are accesing this manu from the "previous page function" the xpath of the scroll box is changed
+                        changed_scroll_flag = True
+                        try:
+                            #do not writte if there are already messages in the conversation (cause you already talked with this person
+                            already_written = self.driver.find_element_by_xpath('//div[@class="iXTil   "]')
+                        except NoSuchElementException:
+                            self._send_messages()
+                            self._human_sleep_fast(2)
                         self.driver.execute_script("window.history.go(-1)")
                         self._human_sleep(4)
                         self.driver.execute_script("window.history.go(-1)")
@@ -132,9 +152,8 @@ class InstaBot:
                         
                     self._human_sleep(1)
                     temp_list_names_of_followed_text = []
-                    print("**** CUCA ****")
                     self._human_sleep(4)
-                    scroll_box = self.driver.find_element_by_xpath("/html/body/div[3]/div/div/div[2]")
+                    
                 with open (self._following_path + self._following_file_name + ".csv",'a') as following_file:
                     writer = csv.writer(following_file, dialect='excel')
                     writer.writerow(followed_list)
@@ -228,36 +247,36 @@ class InstaBot:
         def _take_naps(self, n):
             if n == 4:
                 print("**** Napping 5 min ****", flush=True)
-                sleep(63*4)
+                sleep(63*2)
             if n == 10:
                 print("**** napping 11 min ****", flush=True)
-                sleep(60*12)
+                sleep(60*5)
             if n == 17:
                 print("**** napping 14 min ****", flush=True)
-                sleep(52*12)
+                sleep(52*7)
             if n == 25:
                 print("**** napping 3 min ****", flush=True)
                 sleep(55*3)
             if n == 30:
                 print("**** napping 4 min ****", flush=True)
-                sleep(64*5)
+                sleep(64*2)
             if n == 33:
                 print("**** napping 23 min ****", flush=True)
-                sleep(60*24)
+                sleep(60*14)
             if n == 37:
                 print("**** napping 6 min ****", flush=True)
                 sleep(59*4)
             if n == 40:
                 print("**** napping 5 min ****", flush=True)
-                sleep(49*6)
+                sleep(49*3)
             if n == 45:
                 print("**** napping 9 min ****", flush=True)
-                sleep(57*7)
+                sleep(57*4)
             if n == 48:
                 print("**** Napping 5 min ****", flush=True)
-                sleep(56*6)
+                sleep(56*2)
                             
 a_bot = InstaBot('account', 'pass')
 #a_bot.unfollow_bastards(50)
-a_bot.talk_to_fans_of("account_similar_to_yours", 4)
+a_bot.talk_to_fans_of("account_to_follow_name", 45)
 #print(a_bot._generate_messages())
