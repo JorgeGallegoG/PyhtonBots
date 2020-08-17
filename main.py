@@ -32,6 +32,7 @@ class InstaBot:
         _following_path = ".\data"
         _following_file_name = "following"
         mofos = None
+        unfollowed = 0
                 
         def get_unfollowers(self):
             self.driver.find_element_by_xpath("//a[contains(@href,'/{}')]".format(self.username))\
@@ -59,14 +60,18 @@ class InstaBot:
             self._human_sleep(2)
             scroll_box = self.driver.find_element_by_xpath("/html/body/div[4]/div/div/div[2]")
             self._load_all_contacts(scroll_box)
-            self._human_sleep(10*61)
+            #self._human_sleep(10*61)
             m = n
+            
+            #if multiple executions we don´t want to go through the entire list again, so we skip those contacts already unfollowed
             while n > 0:
                 self._take_naps(n)
                 self._human_sleep(2)
                 
-                name_element = self.driver.find_element_by_xpath("//a[contains(@href, '/{}')]".format(self.mofos[m-n]))
+                name_element = self.driver.find_element_by_xpath("//a[contains(@href, '/{}')]".format(self.mofos[m-n+self.unfollowed]))
+                print ("**** DEBUG name_element " + name_element.text + " ****")
                 antecesor = self._find_ancestor(5, name_element) 
+                print ("**** DEBUG antecesor " + antecesor.text + " ****")
                 button = antecesor.find_element_by_xpath(".//button[contains(text(), 'Following')]")
 
                 self._human_sleep(5)
@@ -80,6 +85,7 @@ class InstaBot:
                 self._human_sleep_slow(3)
 
                 n-=1
+            self.unfollowed += m
             
         def talk_to_fans_of(self, account_name, n_of_fans):
                 search_bar = self.driver.find_element_by_xpath("//input[@placeholder=\"Search\"]")
@@ -100,7 +106,7 @@ class InstaBot:
                 x = 0
                 while x < n_of_fans:
                 #for x in range(n_of_fans):
-                    self._take_naps(x)
+                    #self._take_naps(x)
                     #When we are accesing this manu from the "previous page function" the xpath of the scroll box is changed
                     if changed_scroll_flag == True: 
                         scroll_box = self.driver.find_element_by_xpath("/html/body/div[3]/div/div/div[2]")
@@ -128,6 +134,7 @@ class InstaBot:
                             continue
                     button_to_follow.click()
                     self._human_sleep(3)
+                    
                     antecesor = self._find_ancestor(3, button_to_follow)
                     list_name_of_followed_b = antecesor.find_elements_by_tag_name('a')
                     temp_list_names_of_followed_text = [name.text for name in list_name_of_followed_b if name.text != '']
@@ -241,6 +248,7 @@ class InstaBot:
                                                     return arguments[0].scrollHeight;
                                                     """, scroll_box)
         def _find_ancestor(self, n, element):
+            print("**** Finding antecesor of element " + element.text + " ****")
             if n == 0:
                 return element
             else:
@@ -256,24 +264,27 @@ class InstaBot:
         def _take_naps(self, n):
             if n == 10:
                 print("**** napping 3 min ****", flush=True)
-                sleep(60*13)
+                sleep(60*3)
             if n == 17:
                 print("**** napping 5 min ****", flush=True)
-                sleep(52*15)
+                sleep(52*5)
             if n == 25:
                 print("**** napping 1 min ****", flush=True)
-                sleep(55*11)
+                sleep(55*1)
             if n == 33:
                 print("**** napping 9 min ****", flush=True)
-                sleep(60*19)
+                sleep(60*9)
             if n == 40:
-                print("**** napping 1 min ****", flush=True)
+                print("**** napping 11 min ****", flush=True)
                 sleep(49*11)
             if n == 48:
                 print("**** Napping 2 min ****", flush=True)
-                sleep(56*12)
+                sleep(56*2)
+            if n == 53:
+                print("**** Napping 3 h ****", flush=True)
+                sleep(56*62*3)
                             
 a_bot = InstaBot('account', 'pass')
-a_bot.unfollow_bastards(55)
-#a_bot.talk_to_fans_of("account_to_follow", 60)
+a_bot.unfollow_bastards(65)
+#a_bot.talk_to_fans_of("account_to_shadow", 50)
 #print(a_bot._generate_messages())
