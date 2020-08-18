@@ -14,26 +14,40 @@ class InstaBot:
             self.username = username
             self.driver.get("https://instagram.com")
             
+            self._log_in(username, pw)
+            self._passing_not_nows()
+        #Constants    
+        _following_path = ".\data"
+        _following_file_name = "following"
+        
+        #Global variables
+        mofos = None
+        unfollowed = 0
+        
+        
+        def _log_in(self, username, password):
             self._human_sleep(2)
-            
-            #Log in
             self.driver.find_element_by_xpath("//input[@name=\"username\"]")\
                 .send_keys(username)
             self.driver.find_element_by_xpath("//input[@name=\"password\"]")\
-                .send_keys(pw)
+                .send_keys(password)
             self.driver.find_element_by_xpath("//button[@type=\"submit\"]")\
                 .click()
             self._human_sleep(4)
+            
+        '''
+        Click and close the messages that appear when entering the app for the first time
+        '''
+        def _passing_not_nows(self):
             self.driver.find_element_by_xpath("//button[contains(text(), 'Not Now')]")\
                 .click()
             self._human_sleep(4)
             self.driver.find_element_by_xpath("//button[contains(text(), 'Not Now')]")\
                 .click()
-        _following_path = ".\data"
-        _following_file_name = "following"
-        mofos = None
-        unfollowed = 0
-                
+          
+        '''
+        Returns a list with the accounts that you follow but don´t follow you (following - followed)
+        '''
         def get_unfollowers(self):
             self.driver.find_element_by_xpath("//a[contains(@href,'/{}')]".format(self.username))\
                 .click()
@@ -61,6 +75,12 @@ class InstaBot:
             scroll_box = self.driver.find_element_by_xpath("/html/body/div[4]/div/div/div[2]")
             self._load_all_contacts(scroll_box)
             #self._human_sleep(10*61)
+            self.iterate_list_of_unfollowers(n)
+        
+        """
+        Navigates through the list of of followers and stops following n accounts 
+        """
+        def iterate_list_of_unfollowers(self, n):
             m = n
             
             #if multiple executions we don´t want to go through the entire list again, so we skip those contacts already unfollowed
@@ -68,22 +88,17 @@ class InstaBot:
                 self._take_naps(n)
                 self._human_sleep(2)
                 
-                name_element = self.driver.find_element_by_xpath("//a[contains(@href, '/{}')]".format(self.mofos[m-n+self.unfollowed]))
-                print ("**** DEBUG name_element " + name_element.text + " ****")
-                antecesor = self._find_ancestor(5, name_element) 
-                print ("**** DEBUG antecesor " + antecesor.text + " ****")
-                button = antecesor.find_element_by_xpath(".//button[contains(text(), 'Following')]")
-
+                name_to_unfollow = self.mofos[m-n+self.unfollowed]
+                elem_name_to_unfollow = self.driver.find_element_by_xpath("//a[contains(@href, '/{}')]".format(name_to_unfollow))
+                antecesor_of_unfollowed = self._find_ancestor(5, elem_name_to_unfollow) 
+                button_of_unfollowed = antecesor_of_unfollowed.find_element_by_xpath(".//button[contains(text(), 'Following')]")
                 self._human_sleep(5)
-                button.click()
-                print("**** Stopped following " + self.mofos[m-n] + " ****")
+                name_to_unfollow.click()
+                print("**** Stopped following " + name_to_unfollow + " ****")
                 self._human_sleep(2)
-
                 self.driver.find_element_by_xpath("//button[contains(text(), 'Unfollow')]")\
                     .click()
-                
                 self._human_sleep_slow(3)
-
                 n-=1
             self.unfollowed += m
             
@@ -284,7 +299,7 @@ class InstaBot:
                 print("**** Napping 3 h ****", flush=True)
                 sleep(56*62*3)
                             
-a_bot = InstaBot('account', 'pass')
+a_bot = InstaBot('happy_monster_music', 'fuckinsta55')
 a_bot.unfollow_bastards(65)
-#a_bot.talk_to_fans_of("account_to_shadow", 50)
+#a_bot.talk_to_fans_of("pendulum", 50)
 #print(a_bot._generate_messages())
