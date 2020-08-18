@@ -78,22 +78,22 @@ class InstaBot:
             self.iterate_list_of_unfollowers(n)
         
         """
-        Navigates through the list of of followers and stops following n accounts 
+        Navigates through the list of of unfollowers and stops following n accounts
         """
         def iterate_list_of_unfollowers(self, n):
             m = n
             
-            #if multiple executions we don´t want to go through the entire list again, so we skip those contacts already unfollowed
             while n > 0:
                 self._take_naps(n)
                 self._human_sleep(2)
                 
+                #if multiple executions we don´t want to go through the entire list again, so we skip those contacts already unfollowed
                 name_to_unfollow = self.mofos[m-n+self.unfollowed]
                 elem_name_to_unfollow = self.driver.find_element_by_xpath("//a[contains(@href, '/{}')]".format(name_to_unfollow))
                 antecesor_of_unfollowed = self._find_ancestor(5, elem_name_to_unfollow) 
                 button_of_unfollowed = antecesor_of_unfollowed.find_element_by_xpath(".//button[contains(text(), 'Following')]")
                 self._human_sleep(5)
-                name_to_unfollow.click()
+                button_of_unfollowed.click()
                 print("**** Stopped following " + name_to_unfollow + " ****")
                 self._human_sleep(2)
                 self.driver.find_element_by_xpath("//button[contains(text(), 'Unfollow')]")\
@@ -102,6 +102,7 @@ class InstaBot:
                 n-=1
             self.unfollowed += m
             
+        #TODO Unspaguetti code yeah :)       
         def talk_to_fans_of(self, account_name, n_of_fans):
                 search_bar = self.driver.find_element_by_xpath("//input[@placeholder=\"Search\"]")
                 search_bar.send_keys(account_name)
@@ -217,6 +218,7 @@ class InstaBot:
                 self._human_sleep(3)
             
         #Method to generate a list of messages that when put toguether generate a conversation
+        #TODO read a file with the messages instead of harcoding here
         def _generate_messages(self):
             print("**** Setting messages ****")
             all_messages = []
@@ -276,6 +278,8 @@ class InstaBot:
             sleep(n + randint(0,10))
         def _human_sleep_fast(self, n):
             sleep(n + randint(0,1))
+            
+        #TODO use a randomizer instead of this harcoding
         def _take_naps(self, n):
             if n == 10:
                 print("**** napping 3 min ****", flush=True)
@@ -299,7 +303,8 @@ class InstaBot:
                 print("**** Napping 3 h ****", flush=True)
                 sleep(56*62*3)
                             
-a_bot = InstaBot('happy_monster_music', 'fuckinsta55')
+#TODO write the pass in a file and read it from there
+a_bot = InstaBot('account', 'pass')
 a_bot.unfollow_bastards(65)
-#a_bot.talk_to_fans_of("pendulum", 50)
+#a_bot.talk_to_fans_of("account_to_shadow", 50)
 #print(a_bot._generate_messages())
