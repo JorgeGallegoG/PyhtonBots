@@ -5,26 +5,44 @@ from time import sleep
 from random import randint
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
+from itertools import repeat
 import csv
 import math
+import pickle
 
 class InstaBot:
-        def __init__(self, username, pw):
-            self.driver = webdriver.Chrome()
-            self.username = username
-            self.driver.get("https://instagram.com")
-            
-            self._log_in(username, pw)
-            self._passing_not_nows()
         #Constants    
         _following_path = ".\data"
         _following_file_name = "following"
+        _cookies_file = "cookies.pkl"
         
         #Global variables
         mofos = None
         unfollowed = 0
         
-        
+        def __init__(self, username, pw):
+            self.driver = webdriver.Chrome()
+            self.username = username
+            self.driver.get("https://instagram.com")
+            #load cookies if present
+            try:
+                self._load_cookies()
+                self.driver.get("https://instagram.com")
+                self._passing_not_nows(1)
+            except FileNotFoundError:
+                self._log_in(username, pw)
+                self._save_cookies()
+                self._passing_not_nows(2)
+            
+        #Methods
+        def _save_cookies(self):
+            pickle.dump(self.driver.get_cookies() , open(self._cookies_file,"wb"))
+
+        def _load_cookies(self):
+            cookies = pickle.load(open(self._cookies_file, "rb"))
+            for cookie in cookies:
+                self.driver.add_cookie(cookie)
+
         def _log_in(self, username, password):
             self._human_sleep(2)
             self.driver.find_element_by_xpath("//input[@name=\"username\"]")\
@@ -38,12 +56,11 @@ class InstaBot:
         '''
         Click and close the messages that appear when entering the app for the first time
         '''
-        def _passing_not_nows(self):
-            self.driver.find_element_by_xpath("//button[contains(text(), 'Not Now')]")\
-                .click()
+        def _passing_not_nows(self, n):
+            for i in repeat(None, n):
+                self.driver.find_element_by_xpath("//button[contains(text(), 'Not Now')]")\
+                    .click()
             self._human_sleep(4)
-            self.driver.find_element_by_xpath("//button[contains(text(), 'Not Now')]")\
-                .click()
           
         '''
         Returns a list with the accounts that you follow but don´t follow you (following - followed)
@@ -265,7 +282,6 @@ class InstaBot:
                                                     return arguments[0].scrollHeight;
                                                     """, scroll_box)
         def _find_ancestor(self, n, element):
-            print("**** Finding antecesor of element " + element.text + " ****")
             if n == 0:
                 return element
             else:
@@ -300,8 +316,8 @@ class InstaBot:
                 print("**** Napping 2 min ****", flush=True)
                 sleep(56*2)
             if n == 53:
-                print("**** Napping 3 h ****", flush=True)
-                sleep(56*62*3)
+                print("**** Napping 4 min ****", flush=True)
+                sleep(56*4)
                             
 #TODO write the pass in a file and read it from there
 a_bot = InstaBot('account', 'pass')
