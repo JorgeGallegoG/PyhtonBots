@@ -5,6 +5,7 @@ from time import sleep
 from random import randint
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import StaleElementReferenceException
 from itertools import repeat
 import csv
 import math
@@ -99,12 +100,13 @@ class InstaBot:
         """
         def iterate_list_of_unfollowers(self, n):
             m = n
-            
+            print("**** You follow " + str(len(self.mofos)) + " accounts that are not following you ****")
             while n > 0:
                 self._take_naps(n)
                 self._human_sleep(2)
                 
                 #if multiple executions we don´t want to go through the entire list again, so we skip those contacts already unfollowed
+                print("** DEBUG mofos current: " + str(m-n+self.unfollowed) + " ****")
                 name_to_unfollow = self.mofos[m-n+self.unfollowed]
                 elem_name_to_unfollow = self.driver.find_element_by_xpath("//a[contains(@href, '/{}')]".format(name_to_unfollow))
                 antecesor_of_unfollowed = self._find_ancestor(5, elem_name_to_unfollow) 
@@ -137,7 +139,9 @@ class InstaBot:
                 scroll_box = self.driver.find_element_by_xpath("/html/body/div[4]/div/div/div[2]")
                 changed_scroll_flag = False
                 x = 0
+                print("**** N of fans ", str(n_of_fans) + " ****")
                 while x < n_of_fans:
+                    print("**** x = ", str(x) + " ****")
                 #for x in range(n_of_fans):
                     #self._take_naps(x)
                     #When we are accesing this manu from the "previous page function" the xpath of the scroll box is changed
@@ -177,7 +181,8 @@ class InstaBot:
                         name_of_followed.click()
                         self._human_sleep(3)
                         print(temp_list_names_of_followed_text[0])
-                        x =+ 1
+                        print("x++")
+                        x += 1
                         followed_list.extend(temp_list_names_of_followed_text)
                         self.driver.find_element_by_xpath("//button[contains(text(), 'Message')]")\
                         .click()
@@ -186,7 +191,7 @@ class InstaBot:
                         #When we are accesing this manu from the "previous page function" the xpath of the scroll box is changed
                         changed_scroll_flag = True
                         try:
-                            #do not writte if there are already messages in the conversation (cause you already talked with this person
+                            #do not write if there are already messages in the conversation (cause you already talked with this person
                             already_written = self.driver.find_element_by_xpath('//div[@class="iXTil   "]')
                         except NoSuchElementException:
                             self._send_messages()
@@ -299,16 +304,16 @@ class InstaBot:
         def _take_naps(self, n):
             if n == 10:
                 print("**** napping 3 min ****", flush=True)
-                sleep(60*3)
+                sleep(60*2)
             if n == 17:
                 print("**** napping 5 min ****", flush=True)
-                sleep(52*5)
+                sleep(52*6)
             if n == 25:
                 print("**** napping 1 min ****", flush=True)
-                sleep(55*1)
+                sleep(55*2)
             if n == 33:
                 print("**** napping 9 min ****", flush=True)
-                sleep(60*9)
+                sleep(60*10)
             if n == 40:
                 print("**** napping 11 min ****", flush=True)
                 sleep(49*11)
@@ -317,10 +322,37 @@ class InstaBot:
                 sleep(56*2)
             if n == 53:
                 print("**** Napping 4 min ****", flush=True)
-                sleep(56*4)
-                            
+                sleep(56*3)
+            if n == 65:
+                print("**** Napping 4 min ****", flush=True)
+                sleep(57*1)
+            if n == 70:
+                print("**** Napping 4 min ****", flush=True)
+                sleep(60*5)
+            if n == 78:
+                print("**** Napping 4 min ****", flush=True)
+                sleep(53*3)
+            if n == 89:
+                print("**** Napping 4 min ****", flush=True)
+                sleep(56*2)
+                    
+        def try_unfollow_bastards_until_success(self, n):
+            try:
+                self.unfollow_bastards(n)
+            except (NoSuchElementException, StaleElementReferenceException):
+                self.try_until_success(n)
+        
+        def try_talk_until_success(self,name, n):
+            self.driver.get("https://instagram.com")
+            try:
+                self.talk_to_fans_of(name, n)
+            except (NoSuchElementException, StaleElementReferenceException):
+                self.try_talk_until_success(name, n)
+                
 #TODO write the pass in a file and read it from there
 a_bot = InstaBot('account', 'pass')
-a_bot.unfollow_bastards(65)
-#a_bot.talk_to_fans_of("account_to_shadow", 50)
+#a_bot.try_unfollow_bastards_until_success(100)
+a_bot.try_talk_until_success("account_to_follow", 50)
+
+#a_bot.talk_to_fans_of("account_to_follow", 50)
 #print(a_bot._generate_messages())
