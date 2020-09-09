@@ -8,9 +8,9 @@ from itertools import repeat
 import csv
 import math
 import pickle
-from custom_webdriver import custom_webdriver
+from CustomWebdriver import CustomWebdriver
 
-class insta_bot:
+class InstaBot:
         #Constants    
         _following_path = ".\data"
         _following_file_name = "following"
@@ -24,7 +24,7 @@ class insta_bot:
         * The created bot generates an execution of the browser inicialized in the home instagram page
         """
         def __init__(self, username, pw, proxy = None):
-            self.custom_webdriver = custom_webdriver()
+            self.custom_webdriver = CustomWebdriver()
             #self.account_info =
             if(proxy!=None):
                 self.custom_webdriver.set_IP(proxy)

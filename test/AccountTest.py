@@ -1,7 +1,7 @@
 import csv
 import os
 from Account import Account
-class Account_test:
+class AccountTest:
     def __init__(self):
         self.filepath_test = "test/account_test_data/"
         self.name = "test_name"

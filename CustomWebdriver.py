@@ -5,7 +5,7 @@ Created on Thu Sep  3 19:56:45 2020
 
 @author: Jorge
 """
-class custom_webdriver:
+class CustomWebdriver:
     def __init__(self):
         self.driver = webdriver.Chrome()
     
