@@ -16,5 +16,3 @@ class CustomWebdriver:
         chrome_options.add_argument('--proxy-server=%s' % proxy)
         
         self.driver = webdriver.Chrome(options=chrome_options)
-
-        self.driver.get("http://whatismyipaddress.com")

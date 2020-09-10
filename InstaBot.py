@@ -9,6 +9,7 @@ import csv
 import math
 import pickle
 from CustomWebdriver import CustomWebdriver
+from Account import Account
 
 class InstaBot:
         #Constants    
@@ -21,28 +22,25 @@ class InstaBot:
         unfollowed = 0
         
         """
-        * The created bot generates an execution of the browser inicialized in the home instagram page
+        * The created bot generates an execution of the browser inicialized in the home instagram page,
+        * the execution will work on the account deffined in the given directory, this directory should 
+        * contain the gen_data file, for more info about this file check the Account doc
         """
-        def __init__(self, username, pw, proxy = None):
+        def __init__(self, account_file_path):
             self.custom_webdriver = CustomWebdriver()
-            #self.account_info =
-            if(proxy!=None):
-                self.custom_webdriver.set_IP(proxy)
+            self.account = Account(account_file_path)
+            if(self.account.proxy!=None):
+                self.custom_webdriver.set_IP(self.account.proxy)
                 print("HERE ********************************************")
 
-            self.driver = self.custom_webdriver.driver
-            self.username = username
-            #self.driver.get("https://www.whatismyip.com/es/")
-            
+            self.driver = self.custom_webdriver.driver        #Passing the driver to a local variable so we don´t have to call it everytime
             self.driver.get("https://instagram.com")
-            #sleep(99999*9)
-            #load cookies if present
             try:
                 self._load_cookies()
                 self.driver.get("https://instagram.com")
                 self._passing_not_nows(1)
             except FileNotFoundError:
-                self._log_in(username, pw)
+                self._log_in()
                 self._save_cookies()
                 self._passing_not_nows(2)
         
@@ -54,22 +52,22 @@ class InstaBot:
         def _save_cookies(self):
             print("saving cookies")
             self._human_sleep(3)
-            pickle.dump(self.driver.get_cookies() , open(self._cookies_file,"wb"))
+            pickle.dump(self.driver.get_cookies() , open(self.account.path + '/' + self._cookies_file,"wb"))
 
         def _load_cookies(self):
             print("loading cookies")
             self._human_sleep(3)
-            cookies = pickle.load(open(self._cookies_file, "rb"))
+            cookies = pickle.load(open(self.account.path + '/' + self._cookies_file, "rb"))
             for cookie in cookies:
                 self.driver.add_cookie(cookie)
 
-        def _log_in(self, username, password):
+        def _log_in(self):
             print("log in")
             self._human_sleep(3)
             self.driver.find_element_by_xpath("//input[@name=\"username\"]")\
-                .send_keys(username)
+                .send_keys(self.account.name)
             self.driver.find_element_by_xpath("//input[@name=\"password\"]")\
-                .send_keys(password)
+                .send_keys(self.account.psw)
             self.driver.find_element_by_xpath("//button[@type=\"submit\"]")\
                 .click()
             self._human_sleep(4)
@@ -100,7 +98,7 @@ class InstaBot:
             
         def unfollow_bastards(self, n):
             #access profile page
-            self.driver.find_element_by_xpath("//a[contains(@href,'/{}')]".format(self.username))\
+            self.driver.find_element_by_xpath("//a[contains(@href,'/{}')]".format(self.account.name))\
                 .click()
             self._human_sleep(4)
             #Check if is the first execution (otherwise we have the list generated)
