@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from selenium import webdriver
 import pickle
+import csv
 """
 Created on Wed Sep  10 1:56:45 2020
 
@@ -16,6 +17,7 @@ Created on Wed Sep  10 1:56:45 2020
 class Data:
     
     default_subdirectory_name = "data/"
+    default_conversation_filename = "conversation.csv"
     
     def __init__(self, account_path):
         self.account_path = account_path #Reference to the account holding the Data object
@@ -34,3 +36,11 @@ class Data:
         deserialized = pickle.load(file)
         file.close()
         return deserialized
+    
+    def csv_to_list(self, file_name):
+        with open(file_name, newline='') as file:
+            reader = csv.reader(file)
+            return list(reader)
+        
+    def load_conversation(self):
+        self.conversation = self.csv_to_list(self.default_conversation_filename)
