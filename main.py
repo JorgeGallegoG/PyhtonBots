@@ -1,17 +1,20 @@
 # -*- coding: utf-8 -*-
 from InstaBot import InstaBot
 from test.AccountTest import AccountTest
+from test.DataTest import DataTest
 from Data import Data
 
 """
 *  Test set, uncomment and execute to run all tests
 """
 
-"""
 account_test = AccountTest()
 account_test.test_create_account()
 account_test.test_create_account_without_proxy()
-"""
+
+data_test = DataTest()
+data_test.test_white_list_save_and_load()
+
 
 """
 *  Create csv data file
@@ -28,9 +31,12 @@ account_test.create__test_csv_with_data("", "", "None")
 """
 habibi_bot = InstaBot("accounts/heeyhabibi")
 """
+
+#EXECUTION GOOD
+"""
 happymonster_bot = InstaBot("accounts/happymonster/")
 happymonster_bot.talk_to_fans_of("Netsky", 29)
-
+"""
 
 """
 data = Data("accounts/jeje")

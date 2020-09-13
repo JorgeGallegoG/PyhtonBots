@@ -18,7 +18,7 @@ class Account:
             self.proxy = None
         else:
             self.proxy = data_list[2]
-        self.data = Data(filepath)
+        self.data = Data(filepath).inicialize_data()
         
     """
     ** The loaded data will be done from a file with path and name filepath and has the titles in the first row, values in the second 

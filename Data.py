@@ -28,7 +28,6 @@ class Data:
         self.whitelist = []
         self.unfollowers = []
         self.conversation = []
-        self.inicialize_data()
         
     def inicialize_data(self):
         self.load_conversation()
@@ -60,6 +59,9 @@ class Data:
     
     def save_white_list(self, lis):
         self.serialize_file(lis, self.default_whitelist_filename)
+        
+    def load_white_list(self):
+        return self.deserialize_file(self.default_whitelist_filename)
                         
     
     """
