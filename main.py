@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from InstaBot import InstaBot
 from test.AccountTest import AccountTest
+from Data import Data
 
 """
 *  Test set, uncomment and execute to run all tests
@@ -24,11 +25,26 @@ account_test.create__test_csv_with_data("", "", "None")
 
 
 #Execution
-
+"""
 habibi_bot = InstaBot("accounts/heeyhabibi")
-happymonster_bot = InstaBot("accounts/happymonster")
+"""
+happymonster_bot = InstaBot("accounts/happymonster/")
+happymonster_bot.talk_to_fans_of("Netsky", 29)
+
+
+"""
+data = Data("accounts/jeje")
+#lis1 = [["asd"], ["hehehe"]]
+lis1 = data.deserialize_file("test")
+print(lis1[0])
+print(lis1[1])
+"""
+
+
+
 #a_bot = InstaBot('heeyhabibi', 'eskipiskipuski', "5.188.181.95:45785")
-#a_bot = InstaBot('happy_monster_music', 'ElMounstro51')
+#happymonster_bot = InstaBot("accounts/happymonster")
+
 #a_bot.talk_to_fans_of("subfocus", 20)
 #a_bot.try_talk_until_success("dawnwall", 100)
 #a_bot.try_unfollow_bastards_until_success(74)

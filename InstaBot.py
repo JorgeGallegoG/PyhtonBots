@@ -262,12 +262,12 @@ class InstaBot:
                 
 
                 self._human_sleep(3)
-            
+                
         #Method to generate a list of messages that when put toguether generate a conversation
         #TODO read a file with the messages instead of harcoding here
         def _generate_messages(self):
             print("**** Setting messages ****")
-            all_messages = []
+            """all_messages = []
             
             #Every list contains all the possible messages in that possition (inside de message secuence)
             all_messages.append(["Hi human!", "Hey human!", "I like your style human!"])
@@ -278,8 +278,9 @@ class InstaBot:
             all_messages.append (["https://www.youtube.com/watch?v=U8Y_XPxr8g4&feature=youtu.be"])
             all_messages.append (["I hope you like it!", "I hope you enjoy!", "Enjoy!"])
             all_messages.append (["And have a great human day!", "And have a great human day! Or like we monsters say, GRROOOTHK!!! ❤️"])
-            all_messages.append (["❤️", "👌", "🖖"])
-            return self._select_one_message_for_each_row(all_messages)
+            all_messages.append (["❤️", "👌", "🖖"])"""                                        
+            #return self._select_one_message_for_each_row(all_messages)
+            return self._select_one_message_for_each_row(self.account.data.conversation)
             
             
         def _select_one_message_for_each_row(self, all_messages):
