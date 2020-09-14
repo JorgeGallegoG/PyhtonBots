@@ -223,9 +223,7 @@ class InstaBot:
                     try:
                         #do not write if there are already messages in the conversation (cause you already talked with this person
                         already_written = self.driver.find_element_by_xpath('//div[@class="iXTil  "]')
-                        print("THIS LINE IS EXECUTER MOTHERFUCKER!!!!!!!!!!!!!!!!!")
                     except NoSuchElementException:
-                        print("THIS SECOND LINE IS EXECUTER MOTHERFUCKER!!!!!!!!!!!!!!!!!")
                         self._send_messages()
                         self._human_sleep_fast(2)
                     self.driver.execute_script("window.history.go(-1)")
@@ -249,6 +247,7 @@ class InstaBot:
                 self.driver.execute_script("window.history.go(-1)")
                
         def _send_messages(self):
+            print("***///DEBUG 0***///")
             list_messages = self._generate_messages()
             self._human_sleep(5)
             print("**** Sending Messages ****")
@@ -272,7 +271,6 @@ class InstaBot:
                 self._human_sleep(3)
                 
         #Method to generate a list of messages that when put toguether generate a conversation
-        #TODO read a file with the messages instead of harcoding here
         def _generate_messages(self):
             print("**** Setting messages ****")
             """all_messages = []
@@ -288,7 +286,7 @@ class InstaBot:
             all_messages.append (["And have a great human day!", "And have a great human day! Or like we monsters say, GRROOOTHK!!! ❤️"])
             all_messages.append (["❤️", "👌", "🖖"])"""                                        
             #return self._select_one_message_for_each_row(all_messages)
-            return self._select_one_message_for_each_row(self.account.data.conversation)
+            return self._select_one_message_for_each_row(self.account.get_data().get_conversation())
             
             
         def _select_one_message_for_each_row(self, all_messages):

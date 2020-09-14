@@ -18,8 +18,14 @@ class Account:
             self.proxy = None
         else:
             self.proxy = data_list[2]
-        self.data = Data(filepath).inicialize_data()
+        print("****///DEBUG 1****///")
+        self.__data = Data(filepath)
+        self.__data.inicialize_data()
         
+    #Getters & Setters
+    def get_data(self):
+        return self.__data
+    
     """
     ** The loaded data will be done from a file with path and name filepath and has the titles in the first row, values in the second 
     """

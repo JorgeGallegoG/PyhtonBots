@@ -7,14 +7,14 @@ from Data import Data
 """
 *  Test set, uncomment and execute to run all tests
 """
-
+"""
 account_test = AccountTest()
 account_test.test_create_account()
 account_test.test_create_account_without_proxy()
 
 data_test = DataTest()
 data_test.test_white_list_save_and_load()
-
+"""
 
 """
 *  Create csv data file
@@ -33,10 +33,10 @@ habibi_bot = InstaBot("accounts/heeyhabibi")
 """
 
 #EXECUTION GOOD
-"""
+
 happymonster_bot = InstaBot("accounts/happymonster/")
-happymonster_bot.talk_to_fans_of("Netsky", 29)
-"""
+happymonster_bot.talk_to_fans_of("astrix", 80)
+
 
 """
 data = Data("accounts/jeje")

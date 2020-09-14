@@ -27,9 +27,14 @@ class Data:
         self.gen_data = []
         self.whitelist = []
         self.unfollowers = []
-        self.conversation = []
+        self.__conversation = []
+        
+    # Getters & Setters
+    def get_conversation(self):
+        return self.__conversation
         
     def inicialize_data(self):
+        print("**** Inicializing data of " + self.account_path + " ****")
         self.load_conversation()
     
     """
@@ -55,7 +60,8 @@ class Data:
         return self.remove_empties(lis)
         
     def load_conversation(self):
-        self.conversation = self.csv_to_list(self.account_path + self.default_subdirectory_name + self.default_conversation_filename)
+        print("**** Loading conversation ****")
+        self.__conversation = self.csv_to_list(self.account_path + self.default_subdirectory_name + self.default_conversation_filename)
     
     def save_white_list(self, lis):
         self.serialize_file(lis, self.default_whitelist_filename)
