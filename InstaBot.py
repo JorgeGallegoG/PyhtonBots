@@ -49,6 +49,14 @@ class InstaBot:
             self.webdriver = webdriver
             
         #Methods
+        """
+        *  This method is used to set up a new client profile, it will generate the white list of the client
+        """
+        #TODO COMPLETE
+        def client_first_execution():
+            print("a")
+            
+        
         def _save_cookies(self):
             print("saving cookies")
             self._human_sleep(3)
