@@ -3,6 +3,7 @@ from InstaBot import InstaBot
 from test.AccountTest import AccountTest
 from test.DataTest import DataTest
 from Data import Data
+from time import sleep
 
 """
 *  Test set, uncomment and execute to run all tests
@@ -35,7 +36,8 @@ habibi_bot = InstaBot("accounts/heeyhabibi")
 #EXECUTION GOOD
 
 happymonster_bot = InstaBot("accounts/happymonster/")
-happymonster_bot.talk_to_fans_of("astrix", 80)
+happymonster_bot.unfollow_bastards(85)
+#happymonster_bot.talk_to_fans_of("astrix", 70)
 
 
 """

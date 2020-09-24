@@ -15,11 +15,15 @@ Created on Wed Sep  10 1:56:45 2020
 *  This information will be stored always in files inside the account directory,
 *  under it's own directory with default name data, serialized and deserialized to the 
 *  instanciated objects of this class when required.
+*
+*  temp_followeds contains an array of TempFollowed, lists that are generated when the follow and talk interactions happen
+*  there is one list for every execution
 """
 class Data:
     
     default_subdirectory_name = "data/"
     default_conversation_filename = "conversation.csv"
+    default_temp_followeds = ""
     default_whitelist_filename = "white"
     
     def __init__(self, account_path):
@@ -27,6 +31,7 @@ class Data:
         self.gen_data = []
         self.whitelist = []
         self.unfollowers = []
+        self.temp_followeds = None
         self.__conversation = []
         
     # Getters & Setters

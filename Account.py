@@ -19,6 +19,9 @@ class Account:
         else:
             self.proxy = data_list[2]
         print("****///DEBUG 1****///")
+        """
+        *  Stored data about the account
+        """
         self.__data = Data(filepath)
         self.__data.inicialize_data()
         

@@ -191,7 +191,6 @@ class InstaBot:
                                                       return arguments[0].scrollHeight;
                                                    """, scroll_box)
                         self._human_sleep(3)
-                            
                         #scroll 2 times to be sure it does not get stuck
                         self.driver.execute_script("""
                                                        arguments[0].scrollTo(0, arguments[0].scrollHeight);
@@ -199,25 +198,35 @@ class InstaBot:
                                                    """, scroll_box)
                         self._human_sleep(3)
                         continue
-                button_to_follow.click()
                 self._human_sleep(3)
-                    
+                  
+                """
+                *  When bug happens this returns None
+                """
                 antecesor = self._find_ancestor(3, button_to_follow)
-                list_name_of_followed_b = antecesor.find_elements_by_tag_name('a')
-                temp_list_names_of_followed_text = [name.text for name in list_name_of_followed_b if name.text != '']
+                if antecesor == None:
+                    pass
+                    #TODO handle lists
+                    print("**** Bug on :( ****")
+                    continue
+                print(antecesor.text)
                 name_of_followed = antecesor.find_element_by_xpath(".//a[@href]")
+                print(name_of_followed)
+                print(name_of_followed.text)
+                button_to_follow.click()
+                print("x++")
+                x += 1
+                self._human_sleep(3)
                 try:
                     button_followed = antecesor.find_element_by_xpath(".//button[contains(text(), 'Following')]")
+
                     name_of_followed.click()
-                    self._human_sleep(3)
-                    print(temp_list_names_of_followed_text[0])
-                    print("x++")
-                    x += 1
-                    followed_list.extend(temp_list_names_of_followed_text)
+                    self._human_sleep(4)
+                    """print(temp_list_names_of_followed_text[0])"""
+                    #followed_list.extend(temp_list_names_of_followed_text)
                     self.driver.find_element_by_xpath("//button[contains(text(), 'Message')]")\
                     .click()
                     self._human_sleep(3)
-                        
                     #When we are accesing this manu from the "previous page function" the xpath of the scroll box is changed
                     changed_scroll_flag = True
                     try:
@@ -229,25 +238,23 @@ class InstaBot:
                     self.driver.execute_script("window.history.go(-1)")
                     self._human_sleep(3)
                     self.driver.execute_script("window.history.go(-1)")
-                except NoSuchElementException:
+                except (NoSuchElementException, StaleElementReferenceException):
                     pass
-                        
-                self._human_sleep(1)
-                temp_list_names_of_followed_text = []
+                """self._human_sleep(1)
+                temp_list_names_of_followed_text = []"""
                 self._human_sleep(3)
                     
-            with open (self._following_path + self._following_file_name + ".csv",'a') as following_file:
+            """with open (self._following_path + self._following_file_name + ".csv",'a') as following_file:
                 writer = csv.writer(following_file, dialect='excel')
-                writer.writerow(followed_list)
-                self._human_sleep(3)
-                self.driver.execute_script("window.history.go(-1)")
-                self._human_sleep(1)
-                self.driver.execute_script("window.history.go(-1)")
-                self._human_sleep(1)
-                self.driver.execute_script("window.history.go(-1)")
+                writer.writerow(followed_list)"""
+            self._human_sleep(3)
+            self.driver.execute_script("window.history.go(-1)")
+            self._human_sleep(1)
+            self.driver.execute_script("window.history.go(-1)")
+            self._human_sleep(1)
+            self.driver.execute_script("window.history.go(-1)")
                
         def _send_messages(self):
-            print("***///DEBUG 0***///")
             list_messages = self._generate_messages()
             self._human_sleep(5)
             print("**** Sending Messages ****")
@@ -321,7 +328,16 @@ class InstaBot:
             if n == 0:
                 return element
             else:
-                return self._find_ancestor(n-1, element.find_element_by_xpath('..'))
+                """                
+                *  The program fails randomly on this line selenium.common.exceptions.StaleElementReferenceException:
+                *  Message: stale element reference: element is not attached to the page document
+                *  Until I discover why, as a temporal solution we will save the state and restart
+                """
+                try:
+                    return self._find_ancestor(n-1, element.find_element_by_xpath('..'))
+                except StaleElementReferenceException:
+                    return None 
+                    
             
         def _human_sleep(self, n):
             sleep(n + randint(0,3))
