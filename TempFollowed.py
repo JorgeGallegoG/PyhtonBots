@@ -3,11 +3,11 @@
 *  In the proccess of following/talking to people this list is generated with names of the followed contacts 
 *  The other attribute is an identifier composed by the time and date when the execution started
 """
-import time
+import datetime
 class TempFollowed:
     def __init__(self):
-        self.__date = time.date()
-        self.__time = time.time()
+        self.__date = datetime.date
+        self.__time = datetime.time
         self.__list_followed = None
     
     def set_list_followed(self, lis):

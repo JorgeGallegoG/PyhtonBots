@@ -23,7 +23,7 @@ class Data:
     
     default_subdirectory_name = "data/"
     default_conversation_filename = "conversation.csv"
-    default_temp_followeds = ""
+    default_temp_followeds = "temp_followeds.pkl"
     default_whitelist_filename = "white"
     
     def __init__(self, account_path):
@@ -31,16 +31,41 @@ class Data:
         self.gen_data = []
         self.whitelist = []
         self.unfollowers = []
-        self.temp_followeds = None
+        self.__temp_followeds = None
         self.__conversation = []
         
     # Getters & Setters
+    def get_temp_followeds(self):
+        return self.__temp_followeds
+    
+    def set_temp_followeds(self, temp_followeds):
+        self.__temp_followeds = temp_followeds
+    
     def get_conversation(self):
         return self.__conversation
         
     def inicialize_data(self):
         print("**** Inicializing data of " + self.account_path + " ****")
         self.load_conversation()
+        
+    def save_temp_followeds(self):
+        serialize_file(self, self.__temp_followeds, self.default_temp_followeds)
+        
+    def load_temp_followeds(self):
+        try:
+            self.default_temp_followeds = self.deserialize_file(self.default_temp_followeds)
+        except FileNotFoundError:
+            return
+        
+    def add_elem_to_temp_followeds(self, temp_followed):
+        if self.__temp_followeds == None:
+            print("**** default_temp_followeds not loaded, will try to load****")
+            self.load_temp_followeds()
+            if self.__temp_followeds == None:
+                print("**** Could not load default_temp_followeds will create one****")
+                self.__temp_followeds = [temp_followed]
+                return
+        self.__temp_followeds.append(temp_followed)
     
     """
     *  Serializes a list into the path indicated in the Account containing this data object, inside the default subdirectory

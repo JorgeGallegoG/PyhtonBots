@@ -8,6 +8,7 @@ from time import sleep
 """
 *  Test set, uncomment and execute to run all tests
 """
+
 """
 account_test = AccountTest()
 account_test.test_create_account()
@@ -15,7 +16,10 @@ account_test.test_create_account_without_proxy()
 
 data_test = DataTest()
 data_test.test_white_list_save_and_load()
+data_test.test_add_elem_to_temp_followeds()
+data_test.test_add_two_elem_to_temp_followeds()
 """
+
 
 """
 *  Create csv data file
@@ -36,8 +40,8 @@ habibi_bot = InstaBot("accounts/heeyhabibi")
 #EXECUTION GOOD
 
 happymonster_bot = InstaBot("accounts/happymonster/")
-happymonster_bot.unfollow_bastards(85)
-#happymonster_bot.talk_to_fans_of("astrix", 70)
+#happymonster_bot.unfollow_bastards(85)
+happymonster_bot.talk_to_fans_of("aaa", 100)
 
 
 """
@@ -53,8 +57,8 @@ print(lis1[1])
 #a_bot = InstaBot('heeyhabibi', 'eskipiskipuski', "5.188.181.95:45785")
 #happymonster_bot = InstaBot("accounts/happymonster")
 
-#a_bot.talk_to_fans_of("subfocus", 20)
-#a_bot.try_talk_until_success("dawnwall", 100)
+#a_bot.talk_to_fans_of("", 20)
+#a_bot.try_talk_until_success("", 100)
 #a_bot.try_unfollow_bastards_until_success(74)
 #a_bot.unfollow_bastards(20)
 #a_bot.talk_to_fans_of("ola", 20)
