@@ -44,11 +44,9 @@ class DataTest:
         e3 = "elem3"
         e4 = "elem4"
         lis = [e1, e2, e3, e4]
-        a_temp_followed = TempFollowed()
-        a_temp_followed.set_list_followed(lis)
         
         # When
-        self.undertest.add_elem_to_temp_followeds(a_temp_followed)
+        self.undertest.add_elem_to_temp_followeds(lis)
         
         # Then
         temp_followeds_in_data = self.undertest.get_temp_followeds()
@@ -70,14 +68,10 @@ class DataTest:
         e4 = "elem4"
         lis = [e1, e2]
         lis2 = [e3, e4]
-        a_temp_followed = TempFollowed()
-        a_temp_followed.set_list_followed(lis)
-        a_temp_followed2 = TempFollowed()
-        a_temp_followed2.set_list_followed(lis2)
         
         # When
-        self.undertest.add_elem_to_temp_followeds(a_temp_followed)
-        self.undertest.add_elem_to_temp_followeds(a_temp_followed2)
+        self.undertest.add_elem_to_temp_followeds(lis)
+        self.undertest.add_elem_to_temp_followeds(lis2)
         
         # Then
         temp_followeds_in_data = self.undertest.get_temp_followeds()

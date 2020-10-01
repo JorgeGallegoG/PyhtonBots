@@ -6,8 +6,7 @@
 import datetime
 class TempFollowed:
     def __init__(self):
-        self.__date = datetime.date
-        self.__time = datetime.time
+        self.__time = datetime.datetime.now()
         self.__list_followed = None
     
     def set_list_followed(self, lis):
@@ -15,3 +14,6 @@ class TempFollowed:
         
     def get_list_followed(self):
         return self.__list_followed
+    
+    def get_time(self):
+        return self.__time

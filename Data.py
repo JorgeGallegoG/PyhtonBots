@@ -4,6 +4,7 @@ import pickle
 import csv
 from time import sleep
 import codecs
+from TempFollowed import TempFollowed
 """
 Created on Wed Sep  10 1:56:45 2020
 
@@ -35,6 +36,8 @@ class Data:
         self.__conversation = []
         
     # Getters & Setters
+    def get_white_list(self):
+        return self.whitelist
     def get_temp_followeds(self):
         return self.__temp_followeds
     
@@ -47,17 +50,35 @@ class Data:
     def inicialize_data(self):
         print("**** Inicializing data of " + self.account_path + " ****")
         self.load_conversation()
-        
+        self.load_temp_followeds()
+        self.load_white_list()
+    
+    def check_out_list(self):
+        if self.__temp_followeds == None:
+            self.load_temp_followeds()
+        for temp_followed in self.__temp_followeds:
+            print("List ")
+            print(str(temp_followed.get_time()))
+            print("**** :) ****")
+            for name in temp_followed.get_list_followed():
+                print(name)
+                
     def save_temp_followeds(self):
-        serialize_file(self, self.__temp_followeds, self.default_temp_followeds)
+        print((self.__temp_followeds[0]).get_list_followed()[0])
+        self.serialize_file(self.__temp_followeds, self.default_temp_followeds)
         
     def load_temp_followeds(self):
         try:
-            self.default_temp_followeds = self.deserialize_file(self.default_temp_followeds)
+            self.__temp_followeds = self.deserialize_file(self.default_temp_followeds)
         except FileNotFoundError:
-            return
-        
-    def add_elem_to_temp_followeds(self, temp_followed):
+            return None
+    
+    """
+    *  Passing a list as argument, it creates a new TempFollowed objet to store that list and adds it to temp followeds
+    """
+    def add_elem_to_temp_followeds(self, lis):
+        temp_followed = TempFollowed()
+        temp_followed.set_list_followed(lis)
         if self.__temp_followeds == None:
             print("**** default_temp_followeds not loaded, will try to load****")
             self.load_temp_followeds()
@@ -97,7 +118,11 @@ class Data:
         self.serialize_file(lis, self.default_whitelist_filename)
         
     def load_white_list(self):
-        return self.deserialize_file(self.default_whitelist_filename)
+        print("**** Loading whitelist")
+        try:
+            self.whitelist = self.deserialize_file(self.default_whitelist_filename)
+        except FileNotFoundError:
+            self.whitelist = None
                         
     
     """

@@ -88,15 +88,25 @@ class InstaBot:
                 self.driver.find_element_by_xpath("//button[contains(text(), 'Not Now')]")\
                     .click()
             self._human_sleep(4)
-          
+         
+        def __get_followers_from_profile_page(self):
+            print("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
+            self.driver.find_element_by_xpath("//a[contains(@href, 'following')]")\
+                .click()
+            names = self._get_names()
+            print("**** Created list of following ****", flush=True)
+            return names
+        
+        def __access_profile_page(self):
+            self.driver.find_element_by_xpath("//a[contains(@href,'/{}')]".format(self.account.name))\
+                .click()
+            self._human_sleep(4)
+            
         '''
         Returns a list with the accounts that you follow but don´t follow you (following - followed)
         '''
         def get_unfollowers(self):
-            self.driver.find_element_by_xpath("//a[contains(@href, 'following')]")\
-                .click()
-            following = self._get_names()
-            print("**** Created list of following ****", flush=True)
+            following = self.__get_followers_from_profile_page()
             self.driver.find_element_by_xpath("//a[contains(@href, 'followers')]")\
                 .click()
             followers = self._get_names()
@@ -105,13 +115,14 @@ class InstaBot:
             return bastards
             
         def unfollow_bastards(self, n):
-            #access profile page
-            self.driver.find_element_by_xpath("//a[contains(@href,'/{}')]".format(self.account.name))\
-                .click()
-            self._human_sleep(4)
+            self.__access_profile_page()
             #Check if is the first execution (otherwise we have the list generated)
             if self.list_to_unfollow == None:
-                self.list_to_unfollow = self.get_unfollowers()
+                unfollowers = self.get_unfollowers()
+                if self.account.get_data().get_white_list() == None:
+                    self.list_to_unfollow = unfollowers
+                else:
+                    self.list_to_unfollow = list(set(unfollowers) - set(self.account.get_data().get_white_list()))
                 print("**** Created list of bastards who didn´t follow you back ****", flush=True)
             self._human_sleep(4)
             self.driver.find_element_by_xpath("//a[contains(@href, 'following')]")\
@@ -121,14 +132,17 @@ class InstaBot:
             self._load_all_contacts(scroll_box)
             #self._human_sleep(10*61)
             self.iterate_list_of_unfollowers(n)
+            print("**** No more to unfollow ****")
+            self.__exit()
         
         """
         Navigates through the list of of unfollowers and stops following n accounts
         """
         def iterate_list_of_unfollowers(self, n):
             m = n
-            print("**** You follow " + str(len(self.list_to_unfollow)) + " accounts that are not following you ****")
-            while n > 0:
+            list_to_unfollow_size = len(self.list_to_unfollow)
+            print("**** You follow " + str(list_to_unfollow_size) + " accounts that are not following you ****")
+            while (n > 0) and ((m-n+self.unfollowed) < list_to_unfollow_size):
                 self._take_naps(n)
                 self._human_sleep(1)
                 
@@ -160,26 +174,107 @@ class InstaBot:
             self._human_sleep(2)
             print("**** Accessing the followers of " + account_name + " ****")
         
+        """
+        ** To execute this method you should be located in the home page
+        """
+        def generate_white_list(self):
+            self.__access_profile_page()
+            self.account.get_data().save_white_list(self.__get_followers_from_profile_page()) 
+        
         #TODO Unspaguetti code yeah :)       
         def talk_to_fans_of(self, account_name, n_of_fans):
-            self.access_followers_of(account_name)
-                    
-            #Start following people
-            followed_list = []
-            scroll_box = self.driver.find_element_by_xpath("/html/body/div[4]/div/div/div[2]")
-            changed_scroll_flag = False
-            x = 0
-            print("**** N of fans ", str(n_of_fans) + " ****")
-            while x < n_of_fans:
-                print("**** x = ", str(x) + " ****")
-                self._take_naps(x)
-                self._human_sleep(4)
-                #When we are accesing this menu from the "previous page function" the xpath of the scroll box is changed
-                if changed_scroll_flag == True: 
-                    scroll_box = self.driver.find_element_by_xpath("/html/body/div[3]/div/div/div[2]")
-                self._human_sleep(2)
-                flag = False
-                while flag == False:
+            try:
+                self.access_followers_of(account_name)
+                        
+                #Start following people
+                followed_list = []
+                scroll_box = self.driver.find_element_by_xpath("/html/body/div[4]/div/div/div[2]")
+                changed_scroll_flag = False
+                x = 0
+                print("**** N of fans ", str(n_of_fans) + " ****")
+                # Create a list to store the names of the followed
+                temp_list_followed = []
+                
+                while x < n_of_fans:
+                    print("**** x = ", str(x) + " ****")
+                    self._take_naps(x)
+                    self._human_sleep(4)
+                    #When we are accesing this menu from the "previous page function" the xpath of the scroll box is changed
+                    if changed_scroll_flag == True: 
+                        scroll_box = self.driver.find_element_by_xpath("/html/body/div[3]/div/div/div[2]")
+                    self._human_sleep(2)
+                    flag = False
+                    button_to_follow, flag = self.__scroll_until_follow_button_present(scroll_box, flag)   
+                    """
+                    *  When bug happens this returns None
+                    """
+                    antecesor = self._find_ancestor(3, button_to_follow)
+                    if antecesor == None:
+                        pass
+                        #TODO handle lists
+                        print("**** Bug on :( ****")
+                        continue
+                    name_of_followed = antecesor.find_element_by_xpath(".//a[@href]")
+    
+                    button_to_follow.click()
+                    # Add followed to the list of this execution
+                    temp_list_followed.append(self._cut_string_at_first_pagejump(antecesor.text))
+                    print("x++")
+                    x += 1
+                    self._human_sleep(3)
+                    try:
+                        button_followed = antecesor.find_element_by_xpath(".//button[contains(text(), 'Following')]")
+    
+                        name_of_followed.click()
+                        self._human_sleep(4)
+                        """print(temp_list_names_of_followed_text[0])"""
+                        #followed_list.extend(temp_list_names_of_followed_text)
+                        self.driver.find_element_by_xpath("//button[contains(text(), 'Message')]")\
+                        .click()
+                        self._human_sleep(3)
+                        #When we are accesing this manu from the "previous page function" the xpath of the scroll box is changed
+                        changed_scroll_flag = True
+                        try:
+                            #do not write if there are already messages in the conversation (cause you already talked with this person
+                            already_written = self.driver.find_element_by_xpath('//div[@class="iXTil  "]')
+                        except NoSuchElementException:
+                            self._send_messages()
+                            self._human_sleep_fast(2)
+                        self.driver.execute_script("window.history.go(-1)")
+                        self._human_sleep(3)
+                        self.driver.execute_script("window.history.go(-1)")
+                    except (NoSuchElementException, StaleElementReferenceException):
+                        pass
+                    self._human_sleep(3)
+    
+                self.__save_before_exit(temp_list_followed)
+                self.__exit()
+            # In case any error interrupts the process save the process data and go to main screen
+            except:
+                self.__save_before_exit(temp_list_followed)
+                self.__exit()
+
+        """
+        *  Saves the current state (TempFollowed list in data folder)
+        """
+        def __save_before_exit(self, temp_list_followed):
+            self.account.get_data().load_temp_followeds()
+            self.account.get_data().add_elem_to_temp_followeds(temp_list_followed)
+            self.account.get_data().save_temp_followeds()
+            self._human_sleep(3)
+        
+        """
+        *  Goes to the page 3 steps back (The home page)
+        """
+        def __exit(self):
+            self.driver.execute_script("window.history.go(-1)")
+            self._human_sleep(1)
+            self.driver.execute_script("window.history.go(-1)")
+            self._human_sleep(1)
+            self.driver.execute_script("window.history.go(-1)")
+            
+        def __scroll_until_follow_button_present(self, scroll_box, flag):
+             while flag == False:
                     self._human_sleep(4)
                     try:
                         button_to_follow = scroll_box.find_element_by_xpath(".//button[text()='Follow']")
@@ -198,61 +293,8 @@ class InstaBot:
                                                    """, scroll_box)
                         self._human_sleep(3)
                         continue
-                self._human_sleep(3)
-                  
-                """
-                *  When bug happens this returns None
-                """
-                antecesor = self._find_ancestor(3, button_to_follow)
-                if antecesor == None:
-                    pass
-                    #TODO handle lists
-                    print("**** Bug on :( ****")
-                    continue
-                print(antecesor.text)
-                name_of_followed = antecesor.find_element_by_xpath(".//a[@href]")
-                print(name_of_followed)
-                print(name_of_followed.text)
-                button_to_follow.click()
-                print("x++")
-                x += 1
-                self._human_sleep(3)
-                try:
-                    button_followed = antecesor.find_element_by_xpath(".//button[contains(text(), 'Following')]")
-
-                    name_of_followed.click()
-                    self._human_sleep(4)
-                    """print(temp_list_names_of_followed_text[0])"""
-                    #followed_list.extend(temp_list_names_of_followed_text)
-                    self.driver.find_element_by_xpath("//button[contains(text(), 'Message')]")\
-                    .click()
                     self._human_sleep(3)
-                    #When we are accesing this manu from the "previous page function" the xpath of the scroll box is changed
-                    changed_scroll_flag = True
-                    try:
-                        #do not write if there are already messages in the conversation (cause you already talked with this person
-                        already_written = self.driver.find_element_by_xpath('//div[@class="iXTil  "]')
-                    except NoSuchElementException:
-                        self._send_messages()
-                        self._human_sleep_fast(2)
-                    self.driver.execute_script("window.history.go(-1)")
-                    self._human_sleep(3)
-                    self.driver.execute_script("window.history.go(-1)")
-                except (NoSuchElementException, StaleElementReferenceException):
-                    pass
-                """self._human_sleep(1)
-                temp_list_names_of_followed_text = []"""
-                self._human_sleep(3)
-                    
-            """with open (self._following_path + self._following_file_name + ".csv",'a') as following_file:
-                writer = csv.writer(following_file, dialect='excel')
-                writer.writerow(followed_list)"""
-            self._human_sleep(3)
-            self.driver.execute_script("window.history.go(-1)")
-            self._human_sleep(1)
-            self.driver.execute_script("window.history.go(-1)")
-            self._human_sleep(1)
-            self.driver.execute_script("window.history.go(-1)")
+             return button_to_follow, flag
                
         def _send_messages(self):
             list_messages = self._generate_messages()
@@ -341,11 +383,17 @@ class InstaBot:
             
         def _human_sleep(self, n):
             sleep(n + randint(0,3))
+            
+        def _cut_string_at_first_pagejump(self, string):
+            return str.splitlines(string)[0]
         
         def _human_sleep_slow(self, n):
             sleep(n + randint(0,10))
         def _human_sleep_fast(self, n):
             sleep(n + randint(0,1))
+            
+        def debug(self):
+            self.account.get_data().check_out_list()
             
         #TODO use a randomizer instead of this harcoding
         def _take_naps(self, n):

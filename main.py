@@ -37,11 +37,33 @@ account_test.create__test_csv_with_data("", "", "None")
 habibi_bot = InstaBot("accounts/heeyhabibi")
 """
 
+"""
+**  SET UP NEW ACCOUNT GUIDE
+**  Hire proxy and Authorise by IP
+**  Create a folder with the name of the account inside the folder Accounts
+**  Inside this folder copy and edit the gen_data file from other account folder
+**  Modify gen_data file writing the user name pass and proxy of the account,
+**  if you are going to use your IP then leave that value to None
+**  Create a folder with name "data" inside the created folder
+**  Copy inside this data folder the file "conversation.csv" from other account folder
+**  Edit conversation file to adjust it to the new account
+**  Make a first execution of the InstaBot for this account and then execute a generation of
+**  the white list
+**  
+"""
 #EXECUTION GOOD
-
-happymonster_bot = InstaBot("accounts/happymonster/")
-#happymonster_bot.unfollow_bastards(85)
-happymonster_bot.talk_to_fans_of("aaa", 100)
+habibi_botbot = InstaBot("accounts/heeyhabibi/")
+habibi_botbot.talk_to_fans_of("los_viajes_de_eriel", 100)
+#habibi_botbot.generate_white_list()
+#happymonster_bot = InstaBot("accounts/happymonster/")
+#happymonster_bot.debug()
+#happymonster_bot.unfollow_bastards(10)
+#happymonster_bot.talk_to_fans_of("shpongle", 2)
+#sleep(60*3)
+#happymonster_bot.talk_to_fans_of("astrix", 65)
+#sleep(65*3)
+#happymonster_bot2 = InstaBot("accounts/happymonster/")
+#happymonster_bot2.unfollow_bastards(170)
 
 
 """
