@@ -4,6 +4,8 @@ from test.AccountTest import AccountTest
 from test.DataTest import DataTest
 from Data import Data
 from time import sleep
+import os
+import ray
 
 """
 *  Test set, uncomment and execute to run all tests
@@ -31,11 +33,24 @@ account_test.create__test_csv_with_data("", "", "None")
 """
 
 
-
-#Execution
 """
-habibi_bot = InstaBot("accounts/heeyhabibi")
+*  Parallel processing execution (one method for every account)
 """
+@ray.remote
+def execute_happy_monster():
+    happymonster_bot = InstaBot("accounts/happymonster/")
+    happymonster_bot.talk_to_fans_of("account_to_anchor", 49)
+ 
+@ray.remote
+def execute_heyhabibi():
+    habibi_botbot = InstaBot("accounts/heeyhabibi/")
+    habibi_botbot.talk_to_fans_of("account_to_anchor2", 58)
+    
+ray.init()
+all_ops = []
+all_ops.append(execute_happy_monster.remote())
+all_ops.append(execute_heyhabibi.remote())
+ray.get(all_ops)
 
 """
 **  SET UP NEW ACCOUNT GUIDE
@@ -51,37 +66,14 @@ habibi_bot = InstaBot("accounts/heeyhabibi")
 **  the white list
 **  
 """
-#EXECUTION GOOD
+"""
 habibi_botbot = InstaBot("accounts/heeyhabibi/")
-habibi_botbot.talk_to_fans_of("los_viajes_de_eriel", 100)
-#habibi_botbot.generate_white_list()
+habibi_botbot.generate_white_list()
+"""
+
+"""
+*  Single execution example
+"""
 #happymonster_bot = InstaBot("accounts/happymonster/")
-#happymonster_bot.debug()
-#happymonster_bot.unfollow_bastards(10)
-#happymonster_bot.talk_to_fans_of("shpongle", 2)
-#sleep(60*3)
-#happymonster_bot.talk_to_fans_of("astrix", 65)
-#sleep(65*3)
-#happymonster_bot2 = InstaBot("accounts/happymonster/")
-#happymonster_bot2.unfollow_bastards(170)
-
-
-"""
-data = Data("accounts/jeje")
-#lis1 = [["asd"], ["hehehe"]]
-lis1 = data.deserialize_file("test")
-print(lis1[0])
-print(lis1[1])
-"""
-
-
-
-#a_bot = InstaBot('heeyhabibi', 'eskipiskipuski', "5.188.181.95:45785")
-#happymonster_bot = InstaBot("accounts/happymonster")
-
-#a_bot.talk_to_fans_of("", 20)
 #a_bot.try_talk_until_success("", 100)
 #a_bot.try_unfollow_bastards_until_success(74)
-#a_bot.unfollow_bastards(20)
-#a_bot.talk_to_fans_of("ola", 20)
-#print(a_bot._generate_messages())
